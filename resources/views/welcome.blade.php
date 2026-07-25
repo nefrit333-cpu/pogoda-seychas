@@ -410,7 +410,13 @@
                 0 28px 70px rgba(0, 0, 0, .3);
         }
 
-        .place-row,
+        .place-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            align-items: start;
+            gap: 18px;
+        }
+
         .metric-row {
             display: flex;
             align-items: center;
@@ -420,21 +426,46 @@
 
         .place-copy {
             min-width: 0;
+            max-width: 100%;
         }
 
         .place {
             margin: 0;
-            max-width: 18ch;
+            max-width: 100%;
             overflow: hidden;
             display: -webkit-box;
             -webkit-box-orient: vertical;
             -webkit-line-clamp: 2;
             font-family: "Unbounded", "Manrope", ui-sans-serif, system-ui, sans-serif;
-            font-size: clamp(19px, 2.35vw, 30px);
+            font-size: clamp(21px, 2.45vw, 34px);
             font-weight: 700;
-            line-height: 1.12;
+            line-height: 1.16;
             text-wrap: balance;
+            overflow-wrap: anywhere;
+            hyphens: auto;
             text-shadow: 0 14px 36px rgba(0, 0, 0, .28);
+            cursor: help;
+            transition-property: color, text-shadow, filter;
+            transition-duration: 180ms;
+            transition-timing-function: cubic-bezier(.2, 0, 0, 1);
+        }
+
+        .place.long-place {
+            -webkit-line-clamp: 3;
+            font-size: clamp(16px, 1.75vw, 24px);
+            line-height: 1.14;
+        }
+
+        .place.very-long-place {
+            -webkit-line-clamp: 4;
+            font-size: clamp(14px, 1.45vw, 20px);
+            line-height: 1.12;
+        }
+
+        .place:hover {
+            color: var(--gold);
+            filter: brightness(1.05);
+            text-shadow: 0 16px 42px rgba(255, 209, 102, .18);
         }
 
         .condition {
@@ -835,6 +866,7 @@
             }
 
             .place-row {
+                display: flex;
                 align-items: flex-start;
                 flex-direction: column;
                 gap: 12px;
@@ -842,7 +874,16 @@
 
             .place {
                 max-width: 100%;
-                font-size: clamp(22px, 8vw, 30px);
+                font-size: clamp(20px, 6.8vw, 28px);
+                line-height: 1.16;
+            }
+
+            .place.long-place {
+                font-size: clamp(16px, 5.2vw, 23px);
+            }
+
+            .place.very-long-place {
+                font-size: clamp(14px, 4.2vw, 18px);
             }
 
             .temperature {
@@ -1020,6 +1061,18 @@
         return /городской округ|муниципальный округ|муниципальный район|район/i.test(name || '');
     }
 
+    function compactPlaceLabel(name) {
+        const parts = String(name || '')
+            .split(',')
+            .map((part) => part.trim())
+            .filter(Boolean);
+        const primary = parts.find((part) => !isAdministrativeName(part)) || parts[0] || String(name || '').trim();
+
+        return primary
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+
     function setState(message, isError = false) {
         state.textContent = message;
         state.style.color = isError ? '#ffb4a0' : '#ffd166';
@@ -1031,6 +1084,8 @@
 
     function renderEmptyLocationState(message) {
         setLoading(false);
+        els.place.classList.remove('long-place', 'very-long-place');
+        els.place.title = '';
         els.place.textContent = 'Место не выбрано';
         els.condition.textContent = message;
         els.temperature.textContent = '--°';
@@ -1178,7 +1233,11 @@
         app.classList.toggle('dry', !isRainy);
         app.classList.toggle('storm', isStorm);
 
-        els.place.textContent = label;
+        const visibleLabel = compactPlaceLabel(label);
+        els.place.classList.toggle('long-place', visibleLabel.length > 18);
+        els.place.classList.toggle('very-long-place', visibleLabel.length > 32);
+        els.place.textContent = visibleLabel;
+        els.place.title = label;
         els.condition.textContent = `${weatherText[code] ?? 'Переменная погода'} · облачность ${round(current.cloud_cover)}%`;
         els.temperature.textContent = `${round(current.temperature_2m)}°`;
         els.feels.textContent = `${round(current.apparent_temperature)}°`;
