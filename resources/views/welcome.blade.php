@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#101410">
+    <title>Погода сейчас</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Unbounded:wght@700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            color-scheme: dark;
+            --ink: #f6f3ec;
+            --muted: rgba(246, 243, 236, .68);
+            --soft: rgba(246, 243, 236, .1);
+            --panel: rgba(19, 27, 24, .76);
+            --panel-strong: rgba(18, 22, 20, .94);
+            --line: rgba(246, 243, 236, .16);
+            --mint: #a7f3d0;
+            --aqua: #8be8ff;
+            --coral: #ff7a59;
+            --gold: #ffd166;
+            --green-black: #101410;
+            --radius: 22px;
+            font-family: "Manrope", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html {
+            -webkit-font-smoothing: antialiased;
+            background: var(--green-black);
+        }
+
+        body {
+            min-height: 100dvh;
+            margin: 0;
+            color: var(--ink);
+            background:
+                linear-gradient(115deg, rgba(255, 122, 89, .18), transparent 34%),
+                linear-gradient(215deg, rgba(139, 232, 255, .22), transparent 38%),
+                linear-gradient(180deg, #161e1a 0%, #101410 48%, #0a0d0c 100%);
+            overflow-x: hidden;
+        }
+
+        button,
+        input {
+            font: inherit;
+        }
+
+        button {
+            cursor: pointer;
+        }
+
+        .page {
+            position: relative;
+            isolation: isolate;
+            min-height: 100dvh;
+            padding: 28px;
+        }
+
+        .page::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            z-index: -2;
+            background:
+                linear-gradient(rgba(255, 255, 255, .035) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, .03) 1px, transparent 1px);
+            background-size: 72px 72px;
+            mask-image: linear-gradient(to bottom, rgba(0, 0, 0, .9), transparent 82%);
+            pointer-events: none;
+        }
+
+        .shell {
+            width: min(1180px, 100%);
+            margin: 0 auto;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 18px;
+            min-height: 52px;
+            margin-bottom: 34px;
+        }
+
+        .brand {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--ink);
+            text-decoration: none;
+            font-weight: 760;
+            letter-spacing: 0;
+            transition-property: transform, color;
+            transition-duration: 180ms;
+            transition-timing-function: cubic-bezier(.2, 0, 0, 1);
+        }
+
+        .brand-mark {
+            position: relative;
+            width: 42px;
+            height: 42px;
+            border-radius: 14px;
+            background: linear-gradient(145deg, var(--gold), var(--coral));
+            box-shadow: 0 18px 46px rgba(255, 122, 89, .26);
+            transition-property: transform, box-shadow;
+            transition-duration: 180ms;
+            transition-timing-function: cubic-bezier(.2, 0, 0, 1);
+        }
+
+        .brand-mark::after {
+            content: "";
+            position: absolute;
+            right: 7px;
+            bottom: 9px;
+            width: 18px;
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(16, 20, 16, .86);
+            box-shadow: -8px -4px 0 1px rgba(16, 20, 16, .86);
+        }
+
+        .brand:hover {
+            transform: translateY(-1px);
+        }
+
+        .brand:hover .brand-mark {
+            transform: rotate(-3deg) scale(1.04);
+            box-shadow: 0 22px 56px rgba(255, 122, 89, .34);
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            min-height: 40px;
+            padding: 0 14px;
+            border-radius: 999px;
+            background: rgba(246, 243, 236, .08);
+            box-shadow: inset 0 0 0 1px var(--line);
+            color: var(--muted);
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.02fr) minmax(360px, .98fr);
+            gap: 22px;
+            align-items: stretch;
+        }
+
+        .intro {
+            min-height: 760px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 42px;
+            border-radius: var(--radius);
+            background: rgba(17, 25, 22, .64);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, .12),
+                0 28px 90px rgba(0, 0, 0, .24);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .intro::after {
+            content: "";
+            position: absolute;
+            inset: auto -12% -28% 10%;
+            height: 260px;
+            background: linear-gradient(90deg, rgba(167, 243, 208, .3), rgba(139, 232, 255, .18), transparent);
+            transform: skewY(-8deg);
+            pointer-events: none;
+        }
+
+        h1 {
+            max-width: 720px;
+            margin: 0;
+            font-family: "Unbounded", "Manrope", ui-sans-serif, system-ui, sans-serif;
+            font-size: clamp(40px, 6.1vw, 82px);
+            line-height: 1.03;
+            letter-spacing: 0;
+            text-wrap: balance;
+        }
+
+        .lead {
+            max-width: 560px;
+            margin: 22px 0 0;
+            color: var(--muted);
+            font-size: clamp(17px, 2vw, 21px);
+            line-height: 1.55;
+            text-wrap: pretty;
+        }
+
+        .search-card {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+            width: min(720px, 100%);
+            padding: 10px;
+            border-radius: 18px;
+            background: rgba(246, 243, 236, .92);
+            color: #101410;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, .32);
+            transition-property: transform, box-shadow, background;
+            transition-duration: 180ms;
+            transition-timing-function: cubic-bezier(.2, 0, 0, 1);
+        }
+
+        .search-card:hover {
+            transform: translateY(-2px);
+            background: rgba(246, 243, 236, .96);
+            box-shadow: 0 30px 74px rgba(0, 0, 0, .38);
+        }
+
+        .search-card label {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            overflow: hidden;
+            clip: rect(0 0 0 0);
+        }
+
+        .search-card input {
+            width: 100%;
+            min-height: 50px;
+            border: 0;
+            outline: 0;
+            border-radius: 12px;
+            padding: 0 14px;
+            background: transparent;
+            color: #101410;
+            font-size: 17px;
+            transition-property: background, box-shadow;
+            transition-duration: 180ms;
+            transition-timing-function: cubic-bezier(.2, 0, 0, 1);
+        }
+
+        .search-card input:hover {
+            background: rgba(16, 20, 16, .04);
+        }
+
+        .search-card input::placeholder {
+            color: rgba(16, 20, 16, .58);
+        }
+
+        .search-card input:focus-visible {
+            box-shadow: inset 0 0 0 2px rgba(255, 122, 89, .8);
+        }
+
+        .primary-btn,
+        .ghost-btn {
+            min-height: 50px;
+            border: 0;
+            border-radius: 12px;
+            padding: 0 18px;
+            font-weight: 750;
+            white-space: nowrap;
+            transition-property: transform, background, color, box-shadow;
+            transition-duration: 180ms;
+            transition-timing-function: cubic-bezier(.2, 0, 0, 1);
+        }
+
+        .primary-btn {
+            background: #101410;
+            color: #fffaf0;
+            box-shadow: 0 12px 24px rgba(16, 20, 16, .22);
+        }
+
+        .ghost-btn {
+            background: rgba(16, 20, 16, .08);
+            color: #101410;
+        }
+
+        .primary-btn:hover,
+        .ghost-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .primary-btn:hover {
+            background: #1b221d;
+            box-shadow: 0 16px 32px rgba(16, 20, 16, .3);
+        }
+
+        .primary-btn:active,
+        .ghost-btn:active {
+            transform: scale(.96);
+        }
+
+        .primary-btn:disabled,
+        .ghost-btn:disabled {
+            cursor: wait;
+            opacity: .72;
+            transform: none;
+        }
+
+        .weather-stage {
+            position: relative;
+            min-height: 760px;
+            border-radius: var(--radius);
+            overflow: hidden;
+            background:
+                linear-gradient(180deg, rgba(139, 232, 255, .34), rgba(167, 243, 208, .08) 45%, rgba(12, 16, 14, .92)),
+                #14201d;
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, .14),
+                0 28px 90px rgba(0, 0, 0, .28);
+        }
+
+        .sky-object {
+            position: absolute;
+            top: 52px;
+            right: 58px;
+            width: 112px;
+            height: 112px;
+            border-radius: 50%;
+            background: var(--gold);
+            box-shadow:
+                0 0 0 20px rgba(255, 209, 102, .12),
+                0 0 80px rgba(255, 209, 102, .5);
+            transition-property: background, box-shadow, transform;
+            transition-duration: 500ms;
+        }
+
+        .cloud {
+            position: absolute;
+            left: 36px;
+            top: 150px;
+            width: 240px;
+            height: 82px;
+            border-radius: 999px;
+            background: rgba(246, 243, 236, .86);
+            filter: drop-shadow(0 32px 32px rgba(0, 0, 0, .18));
+            animation: drift 8s ease-in-out infinite;
+        }
+
+        .cloud::before,
+        .cloud::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            background: inherit;
+        }
+
+        .cloud::before {
+            width: 116px;
+            height: 116px;
+            left: 34px;
+            bottom: 22px;
+        }
+
+        .cloud::after {
+            width: 92px;
+            height: 92px;
+            right: 38px;
+            bottom: 24px;
+        }
+
+        .rain {
+            position: absolute;
+            inset: 270px 64px auto 74px;
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 16px;
+            opacity: .36;
+            transition: opacity 300ms ease;
+        }
+
+        .rain span {
+            height: 118px;
+            border-radius: 999px;
+            background: linear-gradient(to bottom, transparent, rgba(139, 232, 255, .78));
+            transform: rotate(12deg);
+            animation: rain 900ms linear infinite;
+            animation-delay: calc(var(--i) * -90ms);
+        }
+
+        .current-panel {
+            position: absolute;
+            left: 24px;
+            right: 24px;
+            bottom: 24px;
+            padding: 26px;
+            border-radius: 20px;
+            background: rgba(10, 13, 12, .72);
+            backdrop-filter: blur(18px);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, .12),
+                0 20px 50px rgba(0, 0, 0, .22);
+            transition-property: transform, background, box-shadow;
+            transition-duration: 220ms;
+            transition-timing-function: cubic-bezier(.2, 0, 0, 1);
+        }
+
+        .current-panel:hover {
+            transform: translateY(-3px);
+            background: rgba(10, 13, 12, .78);
+            box-shadow:
+                inset 0 1px 0 rgba(255, 255, 255, .16),
+                0 28px 70px rgba(0, 0, 0, .3);
+        }
+
+        .place-row,
+        .metric-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .place-copy {
+            min-width: 0;
+        }
+
+        .place {
+            margin: 0;
+            max-width: 18ch;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            font-family: "Unbounded", "Manrope", ui-sans-serif, system-ui, sans-serif;
+            font-size: clamp(19px, 2.35vw, 30px);
+            font-weight: 700;
+            line-height: 1.12;
+            text-wrap: balance;
+            text-shadow: 0 14px 36px rgba(0, 0, 0, .28);
+        }
+
+        .condition {
+            color: var(--muted);
+            margin-top: 8px;
+            font-size: 15px;
+        }
+
+        .temperature {
+            font-size: clamp(64px, 11vw, 112px);
+            line-height: .88;
+            font-weight: 820;
+            letter-spacing: 0;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .metric-row {
+            margin-top: 20px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .metric {
+            min-height: 78px;
+            padding: 14px;
+            border-radius: 15px;
+            background: rgba(246, 243, 236, .08);
+            box-shadow: inset 0 0 0 1px rgba(246, 243, 236, .02);
+            transition-property: transform, background, box-shadow;
+            transition-duration: 180ms;
+            transition-timing-function: cubic-bezier(.2, 0, 0, 1);
+        }
+
+        .metric:hover {
+            transform: translateY(-2px);
+            background: rgba(246, 243, 236, .13);
+            box-shadow:
+                inset 0 0 0 1px rgba(246, 243, 236, .12),
+                0 16px 34px rgba(0, 0, 0, .18);
+        }
+
+        .metric small {
+            display: block;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .metric strong {
+            display: block;
+            margin-top: 7px;
+            font-size: clamp(16px, 1.4vw, 18px);
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        .hourly-section {
+            margin-top: 16px;
+        }
+
+        .section-label {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 14px;
+            margin-bottom: 10px;
+            color: rgba(246, 243, 236, .86);
+            font-size: 14px;
+            font-weight: 760;
+        }
+
+        .section-label span {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 520;
+            white-space: nowrap;
+        }
+
+        .hourly-track {
+            display: grid;
+            grid-auto-flow: column;
+            grid-auto-columns: minmax(86px, 1fr);
+            gap: 10px;
+            overflow-x: auto;
+            overscroll-behavior-inline: contain;
+            padding: 1px 1px 8px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(246, 243, 236, .22) transparent;
+        }
+
+        .hour-card {
+            min-height: 104px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 12px;
+            border-radius: 15px;
+            background: rgba(246, 243, 236, .08);
+            box-shadow: inset 0 0 0 1px rgba(246, 243, 236, .08);
+            scroll-snap-align: start;
+            transition-property: transform, background, box-shadow;
+            transition-duration: 180ms;
+            transition-timing-function: cubic-bezier(.2, 0, 0, 1);
+        }
+
+        .hour-card:hover {
+            transform: translateY(-2px);
+            background: rgba(246, 243, 236, .13);
+            box-shadow:
+                inset 0 0 0 1px rgba(246, 243, 236, .15),
+                0 18px 38px rgba(0, 0, 0, .2);
+        }
+
+        .hour-time,
+        .hour-meta {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .hour-temp {
+            margin-top: 8px;
+            font-size: 24px;
+            line-height: 1;
+            font-weight: 820;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .hour-meta {
+            margin-top: 8px;
+            line-height: 1.35;
+        }
+
+        .weekly-section {
+            margin-top: 22px;
+        }
+
+        .forecast {
+            display: grid;
+            grid-template-columns: repeat(5, minmax(0, 1fr));
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .day {
+            min-height: 128px;
+            padding: 13px 12px;
+            border-radius: 18px;
+            background: rgba(246, 243, 236, .08);
+            box-shadow: inset 0 0 0 1px rgba(246, 243, 236, .08);
+            transition-property: transform, background, box-shadow;
+            transition-duration: 180ms;
+            transition-timing-function: cubic-bezier(.2, 0, 0, 1);
+        }
+
+        .day:hover {
+            transform: translateY(-2px);
+            background: rgba(246, 243, 236, .13);
+            box-shadow:
+                inset 0 0 0 1px rgba(246, 243, 236, .15),
+                0 18px 38px rgba(0, 0, 0, .2);
+        }
+
+        .day-name {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .day-temp {
+            margin-top: 12px;
+            font-size: clamp(14px, 1.18vw, 18px);
+            font-weight: 800;
+            font-variant-numeric: tabular-nums;
+            white-space: nowrap;
+        }
+
+        .day-desc {
+            margin-top: 8px;
+            min-height: 38px;
+            color: rgba(246, 243, 236, .72);
+            font-size: 13px;
+            line-height: 1.35;
+        }
+
+        .bar {
+            margin-top: 13px;
+            height: 6px;
+            border-radius: 999px;
+            background: rgba(246, 243, 236, .12);
+            overflow: hidden;
+        }
+
+        .bar span {
+            display: block;
+            height: 100%;
+            width: var(--w, 40%);
+            border-radius: inherit;
+            background: linear-gradient(90deg, var(--mint), var(--coral));
+        }
+
+        .footnote {
+            margin-top: 20px;
+            color: rgba(246, 243, 236, .54);
+            font-size: 13px;
+        }
+
+        .state {
+            margin-top: 16px;
+            min-height: 22px;
+            color: var(--gold);
+            font-size: 14px;
+        }
+
+        .loading .temperature,
+        .loading .place,
+        .loading .condition,
+        .loading .metric,
+        .loading .hour-card,
+        .loading .day {
+            color: transparent;
+            background-image: linear-gradient(100deg, rgba(246, 243, 236, .08), rgba(246, 243, 236, .2), rgba(246, 243, 236, .08));
+            background-size: 220% 100%;
+            animation: shimmer 1.1s ease-in-out infinite;
+        }
+
+        .night .weather-stage {
+            background:
+                linear-gradient(180deg, rgba(121, 110, 255, .18), rgba(139, 232, 255, .05) 42%, rgba(8, 10, 12, .96)),
+                #101114;
+        }
+
+        .night .sky-object {
+            background: #f6f3ec;
+            box-shadow:
+                inset -24px 0 0 rgba(16, 20, 16, .22),
+                0 0 0 18px rgba(246, 243, 236, .08),
+                0 0 70px rgba(139, 232, 255, .24);
+        }
+
+        .dry .rain {
+            opacity: .08;
+        }
+
+        .storm .rain {
+            opacity: .8;
+        }
+
+        @keyframes drift {
+            0%, 100% { transform: translate3d(0, 0, 0); }
+            50% { transform: translate3d(18px, -8px, 0); }
+        }
+
+        @keyframes rain {
+            0% { transform: translateY(-22px) rotate(12deg); opacity: 0; }
+            18% { opacity: 1; }
+            100% { transform: translateY(42px) rotate(12deg); opacity: 0; }
+        }
+
+        @keyframes shimmer {
+            to { background-position: -220% 0; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 1ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 1ms !important;
+            }
+        }
+
+        @media (max-width: 940px) {
+            .page {
+                padding: 18px;
+            }
+
+            .hero {
+                grid-template-columns: 1fr;
+            }
+
+            .intro,
+            .weather-stage {
+                min-height: auto;
+            }
+
+            .intro {
+                gap: 42px;
+                padding: 30px;
+            }
+
+            .weather-stage {
+                min-height: auto;
+                padding-top: 250px;
+            }
+
+            .current-panel {
+                position: relative;
+                left: auto;
+                right: auto;
+                bottom: auto;
+                margin: 0 18px 18px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .page {
+                padding: 14px;
+            }
+
+            .topbar {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 12px;
+                margin-bottom: 18px;
+            }
+
+            .status-pill {
+                width: 100%;
+                justify-content: center;
+                min-height: 38px;
+            }
+
+            .search-card {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                padding: 9px;
+                border-radius: 16px;
+            }
+
+            .search-card input,
+            .primary-btn {
+                min-height: 48px;
+            }
+
+            .hero {
+                gap: 14px;
+            }
+
+            .intro {
+                gap: 34px;
+                padding: 24px;
+                border-radius: 18px;
+            }
+
+            h1 {
+                font-size: clamp(34px, 13vw, 52px);
+                line-height: 1.06;
+            }
+
+            .lead {
+                margin-top: 18px;
+                font-size: 16px;
+            }
+
+            .primary-btn,
+            .ghost-btn {
+                width: 100%;
+            }
+
+            .weather-stage {
+                min-height: auto;
+                padding-top: 208px;
+                border-radius: 18px;
+            }
+
+            .sky-object {
+                top: 38px;
+                right: 30px;
+                width: 76px;
+                height: 76px;
+            }
+
+            .cloud {
+                top: 112px;
+                left: 24px;
+                width: 176px;
+                height: 62px;
+            }
+
+            .cloud::before {
+                width: 88px;
+                height: 88px;
+            }
+
+            .cloud::after {
+                width: 72px;
+                height: 72px;
+            }
+
+            .current-panel {
+                position: relative;
+                left: auto;
+                right: auto;
+                bottom: auto;
+                margin: 0 14px 14px;
+                padding: 18px;
+                border-radius: 18px;
+            }
+
+            .place-row {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .place {
+                max-width: 100%;
+                font-size: clamp(22px, 8vw, 30px);
+            }
+
+            .temperature {
+                font-size: clamp(58px, 21vw, 82px);
+            }
+
+            .metric-row,
+            .forecast {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .metric {
+                min-height: 72px;
+                padding: 13px;
+            }
+
+            .hourly-track {
+                grid-auto-columns: minmax(104px, 44%);
+            }
+
+            .section-label {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 4px;
+            }
+
+            .day {
+                min-height: 122px;
+            }
+
+            .footnote {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+<main class="page dry" id="app">
+    <div class="shell">
+        <header class="topbar" aria-label="Верхняя панель">
+            <a class="brand" href="/" aria-label="Погода сейчас">
+                <span class="brand-mark" aria-hidden="true"></span>
+                <span>Погода сейчас</span>
+            </a>
+            <div class="status-pill" id="updatedAt">Данные обновляются</div>
+        </header>
+
+        <section class="hero" aria-labelledby="page-title">
+            <div class="intro">
+                <div>
+                    <h1 id="page-title">Живая погода без суеты жизни</h1>
+                    <p class="lead">Город, температура, ветер, влажность и прогноз на ближайшие дни в одном спокойном экране.</p>
+                </div>
+
+                <form class="search-card" id="searchForm">
+                    <label for="cityInput">Город</label>
+                    <input id="cityInput" name="city" autocomplete="address-level2" value="" placeholder="Введите город">
+                    <button class="primary-btn" type="submit">Показать</button>
+                </form>
+                <div class="state" id="state" role="status" aria-live="polite"></div>
+            </div>
+
+            <section class="weather-stage" aria-label="Погодная сводка">
+                <div class="sky-object" aria-hidden="true"></div>
+                <div class="cloud" aria-hidden="true"></div>
+                <div class="rain" aria-hidden="true">
+                    <span style="--i:1"></span><span style="--i:2"></span><span style="--i:3"></span>
+                    <span style="--i:4"></span><span style="--i:5"></span><span style="--i:6"></span>
+                    <span style="--i:7"></span><span style="--i:8"></span><span style="--i:9"></span>
+                </div>
+
+                <div class="current-panel loading" id="weatherPanel">
+                    <div class="place-row">
+                        <div class="place-copy">
+                            <p class="place" id="place">Загрузка</p>
+                            <div class="condition" id="condition">Получаю свежие данные</div>
+                        </div>
+                        <div class="temperature" id="temperature">--°</div>
+                    </div>
+
+                    <div class="metric-row" aria-label="Подробности">
+                        <div class="metric"><small>Ощущается</small><strong id="feels">--°</strong></div>
+                        <div class="metric"><small>Ветер</small><strong id="wind">--</strong></div>
+                        <div class="metric"><small>Влажность</small><strong id="humidity">--</strong></div>
+                        <div class="metric"><small>Давление</small><strong id="pressure">--</strong></div>
+                    </div>
+
+                    <section class="hourly-section" aria-label="Подробный прогноз дня по часам">
+                        <div class="section-label">Сегодня по часам <span>температура, дождь, ветер</span></div>
+                        <div class="hourly-track" id="hourlyForecast"></div>
+                    </section>
+
+                    <section class="weekly-section" aria-label="Прогноз на неделю">
+                        <div class="section-label">Прогноз на неделю <span>день и ночь</span></div>
+                        <div class="forecast" id="forecast"></div>
+                    </section>
+                    <div class="footnote">Источник прогноза: Open-Meteo. Населённый пункт для геолокации определяет BigDataCloud.</div>
+                </div>
+            </section>
+        </section>
+    </div>
+</main>
+
+<script>
+    const app = document.querySelector('#app');
+    const form = document.querySelector('#searchForm');
+    const input = document.querySelector('#cityInput');
+    const state = document.querySelector('#state');
+    const panel = document.querySelector('#weatherPanel');
+    const els = {
+        updatedAt: document.querySelector('#updatedAt'),
+        place: document.querySelector('#place'),
+        condition: document.querySelector('#condition'),
+        temperature: document.querySelector('#temperature'),
+        feels: document.querySelector('#feels'),
+        wind: document.querySelector('#wind'),
+        humidity: document.querySelector('#humidity'),
+        pressure: document.querySelector('#pressure'),
+        hourly: document.querySelector('#hourlyForecast'),
+        forecast: document.querySelector('#forecast'),
+    };
+
+    const weatherText = {
+        0: 'Ясно',
+        1: 'Почти ясно',
+        2: 'Переменная облачность',
+        3: 'Пасмурно',
+        45: 'Туман',
+        48: 'Иней и туман',
+        51: 'Лёгкая морось',
+        53: 'Морось',
+        55: 'Плотная морось',
+        56: 'Ледяная морось',
+        57: 'Сильная ледяная морось',
+        61: 'Небольшой дождь',
+        63: 'Дождь',
+        65: 'Сильный дождь',
+        66: 'Ледяной дождь',
+        67: 'Сильный ледяной дождь',
+        71: 'Небольшой снег',
+        73: 'Снег',
+        75: 'Сильный снег',
+        77: 'Снежные зёрна',
+        80: 'Краткий дождь',
+        81: 'Ливень',
+        82: 'Сильный ливень',
+        85: 'Снегопад',
+        86: 'Сильный снегопад',
+        95: 'Гроза',
+        96: 'Гроза с градом',
+        99: 'Сильная гроза с градом',
+    };
+
+    const rainyCodes = new Set([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99]);
+    const stormCodes = new Set([65, 82, 95, 96, 99]);
+
+    function round(value) {
+        return Math.round(Number(value));
+    }
+
+    function formatAccuracy(value) {
+        if (!Number.isFinite(value)) {
+            return 'по данным браузера';
+        }
+
+        return value >= 1000 ? `±${(value / 1000).toFixed(1)} км` : `±${Math.round(value)} м`;
+    }
+
+    function formatPoint(latitude, longitude) {
+        return `${Number(latitude).toFixed(5)}, ${Number(longitude).toFixed(5)}`;
+    }
+
+    function isAdministrativeName(name) {
+        return /городской округ|муниципальный округ|муниципальный район|район/i.test(name || '');
+    }
+
+    function setState(message, isError = false) {
+        state.textContent = message;
+        state.style.color = isError ? '#ffb4a0' : '#ffd166';
+    }
+
+    function setLoading(isLoading) {
+        panel.classList.toggle('loading', isLoading);
+    }
+
+    function renderEmptyLocationState(message) {
+        setLoading(false);
+        els.place.textContent = 'Место не выбрано';
+        els.condition.textContent = message;
+        els.temperature.textContent = '--°';
+        els.feels.textContent = '--°';
+        els.wind.textContent = '--';
+        els.humidity.textContent = '--';
+        els.pressure.textContent = '--';
+        els.hourly.innerHTML = '';
+        els.forecast.innerHTML = '';
+    }
+
+    async function fetchJson(url) {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error('Сервис погоды временно недоступен');
+        }
+        return response.json();
+    }
+
+    async function findCity(name) {
+        const url = new URL('https://geocoding-api.open-meteo.com/v1/search');
+        url.search = new URLSearchParams({
+            name,
+            count: '1',
+            language: 'ru',
+            format: 'json',
+        });
+
+        const data = await fetchJson(url);
+        const place = data.results?.[0];
+        if (!place) {
+            throw new Error('Город не найден. Проверьте название и попробуйте ещё раз');
+        }
+        return place;
+    }
+
+    async function getWeather(latitude, longitude, label) {
+        const url = new URL('https://api.open-meteo.com/v1/forecast');
+        url.search = new URLSearchParams({
+            latitude,
+            longitude,
+            current: 'temperature_2m,relative_humidity_2m,apparent_temperature,is_day,precipitation,weather_code,cloud_cover,wind_speed_10m,wind_direction_10m,surface_pressure',
+            hourly: 'temperature_2m,relative_humidity_2m,precipitation_probability,weather_code,wind_speed_10m',
+            daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max',
+            timezone: 'auto',
+            forecast_days: '5',
+        });
+
+        const data = await fetchJson(url);
+        return { data, label };
+    }
+
+    async function reverseGeocode(latitude, longitude) {
+        const url = new URL('https://api.bigdatacloud.net/data/reverse-geocode-client');
+        url.search = new URLSearchParams({
+            latitude,
+            longitude,
+            localityLanguage: 'ru',
+        });
+
+        const data = await fetchJson(url);
+        const settlement = data.city || data.locality;
+        const nearby = data.localityInfo?.informative
+            ?.map((item) => item.name)
+            ?.filter(Boolean)
+            ?.filter((name) => !['Европа', 'Europe/Moscow', 'Москва и Московская область'].includes(name))
+            ?.at(-1);
+        const region = data.principalSubdivision;
+        const country = data.countryName;
+
+        if (!nearby && !settlement && !region && !country) {
+            throw new Error('Не удалось определить населённый пункт');
+        }
+
+        const displayName = settlement && !isAdministrativeName(settlement)
+            ? settlement
+            : nearby || settlement || region || country;
+        const fullName = [displayName, settlement, region, country]
+            .filter(Boolean)
+            .filter((part, index, parts) => parts.indexOf(part) === index)
+            .join(', ');
+
+        return { displayName, fullName };
+    }
+
+    function renderHourly(hourly, currentTime) {
+        const currentDate = new Date(currentTime);
+        currentDate.setMinutes(0, 0, 0);
+        const currentHour = currentDate.getTime();
+        const currentDay = currentTime.slice(0, 10);
+        const todayHours = hourly.time
+            .map((time, index) => ({ time, index }))
+            .filter((item) => item.time.slice(0, 10) === currentDay)
+            .filter((item) => new Date(item.time).getTime() >= currentHour)
+            .slice(0, 12);
+
+        els.hourly.innerHTML = todayHours.map(({ time, index }) => {
+            const hour = new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit' }).format(new Date(time));
+            const temp = round(hourly.temperature_2m[index]);
+            const wind = round(hourly.wind_speed_10m[index]);
+            const humidity = round(hourly.relative_humidity_2m[index]);
+            const rain = hourly.precipitation_probability[index] ?? 0;
+            const code = hourly.weather_code[index];
+
+            return `
+                <article class="hour-card">
+                    <div>
+                        <div class="hour-time">${hour}</div>
+                        <div class="hour-temp">${temp}°</div>
+                    </div>
+                    <div class="hour-meta">${weatherText[code] ?? 'Переменно'}<br>${rain}% дождь · ${wind} км/ч · ${humidity}%</div>
+                </article>
+            `;
+        }).join('');
+    }
+
+    function renderForecast(daily) {
+        els.forecast.innerHTML = daily.time.map((date, index) => {
+            const day = new Intl.DateTimeFormat('ru-RU', { weekday: 'short' }).format(new Date(date));
+            const max = round(daily.temperature_2m_max[index]);
+            const min = round(daily.temperature_2m_min[index]);
+            const code = daily.weather_code[index];
+            const chance = daily.precipitation_probability_max[index] ?? 0;
+
+            return `
+                <article class="day">
+                    <div class="day-name">${day}</div>
+                    <div class="day-temp">${max}°/${min}°</div>
+                    <div class="day-desc">${weatherText[code] ?? 'Переменная погода'}</div>
+                    <div class="bar" aria-label="Вероятность осадков ${chance}%"><span style="--w:${Math.max(8, chance)}%"></span></div>
+                </article>
+            `;
+        }).join('');
+    }
+
+    function renderWeather(payload) {
+        const { data, label } = payload;
+        const current = data.current;
+        const code = current.weather_code;
+        const isNight = Number(current.is_day) === 0;
+        const isRainy = rainyCodes.has(code);
+        const isStorm = stormCodes.has(code);
+
+        app.classList.toggle('night', isNight);
+        app.classList.toggle('dry', !isRainy);
+        app.classList.toggle('storm', isStorm);
+
+        els.place.textContent = label;
+        els.condition.textContent = `${weatherText[code] ?? 'Переменная погода'} · облачность ${round(current.cloud_cover)}%`;
+        els.temperature.textContent = `${round(current.temperature_2m)}°`;
+        els.feels.textContent = `${round(current.apparent_temperature)}°`;
+        els.wind.textContent = `${round(current.wind_speed_10m)} км/ч`;
+        els.humidity.textContent = `${round(current.relative_humidity_2m)}%`;
+        els.pressure.textContent = `${round(current.surface_pressure)} гПа`;
+        els.updatedAt.textContent = new Intl.DateTimeFormat('ru-RU', {
+            hour: '2-digit',
+            minute: '2-digit',
+            day: '2-digit',
+            month: 'short',
+        }).format(new Date(current.time));
+
+        renderHourly(data.hourly, current.time);
+        renderForecast(data.daily);
+        setLoading(false);
+        setState('');
+    }
+
+    async function loadByCity(name) {
+        const city = name.trim();
+        if (!city) {
+            setState('Введите название города', true);
+            return;
+        }
+
+        setLoading(true);
+        setState('Ищу город и обновляю прогноз');
+
+        try {
+            const place = await findCity(city);
+            const payload = await getWeather(place.latitude, place.longitude, place.name);
+            renderWeather(payload);
+            input.value = place.name;
+        } catch (error) {
+            setLoading(false);
+            setState(error.message, true);
+        }
+    }
+
+    async function loadByCoordinates(latitude, longitude, accuracy) {
+        setLoading(true);
+        setState(`Точка найдена: ${formatPoint(latitude, longitude)}, определяю населённый пункт`);
+
+        try {
+            const place = await reverseGeocode(latitude, longitude);
+            const payload = await getWeather(latitude, longitude, place.displayName);
+            renderWeather(payload);
+            input.value = place.displayName;
+        } catch (error) {
+            setLoading(false);
+            setState(error.message, true);
+        }
+    }
+
+    function requestCurrentLocation() {
+        if (!navigator.geolocation) {
+            renderEmptyLocationState('Геолокация не поддерживается этим браузером');
+            setState('Введите город вручную', true);
+            return;
+        }
+
+        setLoading(true);
+        setState('Запрашиваю точное местоположение');
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => loadByCoordinates(
+                position.coords.latitude,
+                position.coords.longitude,
+                position.coords.accuracy
+            ),
+            () => {
+                renderEmptyLocationState('Разрешите геолокацию или введите город вручную');
+                setState('Браузер не дал доступ к точному местоположению', true);
+            },
+            { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
+        );
+    }
+
+    form.addEventListener('submit', (event) => {
+        event.preventDefault();
+        loadByCity(input.value);
+    });
+
+    requestCurrentLocation();
+</script>
+</body>
+</html>
