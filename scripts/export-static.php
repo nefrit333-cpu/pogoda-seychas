@@ -40,6 +40,13 @@ if (is_dir($assetSourceDirectory)) {
         exit(1);
     }
 
+    foreach (glob($assetTargetDirectory . '/*') ?: [] as $oldAsset) {
+        if (is_file($oldAsset) && ! unlink($oldAsset)) {
+            fwrite(STDERR, "Unable to remove old weather asset: {$oldAsset}\n");
+            exit(1);
+        }
+    }
+
     foreach (glob($assetSourceDirectory . '/*') ?: [] as $asset) {
         $targetAsset = $assetTargetDirectory . '/' . basename($asset);
 

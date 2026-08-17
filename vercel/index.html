@@ -1032,7 +1032,7 @@
 
             <section class="weather-stage uses-art" aria-label="Погодная сводка">
                 <figure class="weather-visual" aria-hidden="true">
-                    <img id="weatherImage" src="/weather-assets/clouds-day.png" alt="">
+                    <img id="weatherImage" src="/weather-assets/clouds-day.webp" alt="">
                 </figure>
                 <div class="sky-object" aria-hidden="true"></div>
                 <div class="cloud" aria-hidden="true"></div>
@@ -1130,14 +1130,14 @@
     const cloudyCodes = new Set([3, 45, 48, 71, 73, 75, 77, 85, 86]);
     const partlyCloudyCodes = new Set([1, 2]);
     const weatherImages = {
-        clearDay: '/weather-assets/sunny.png',
-        clearNight: '/weather-assets/moon.png',
-        partlyDay: '/weather-assets/sun-cloud.png',
-        partlyNight: '/weather-assets/moon-cloud.png',
-        cloudyDay: '/weather-assets/clouds-day.png',
-        cloudyNight: '/weather-assets/clouds-night.png',
-        stormDay: '/weather-assets/storm-day.png',
-        stormNight: '/weather-assets/storm-night.png',
+        clearDay: '/weather-assets/sunny.webp',
+        clearNight: '/weather-assets/moon.webp',
+        partlyDay: '/weather-assets/sun-cloud.webp',
+        partlyNight: '/weather-assets/moon-cloud.webp',
+        cloudyDay: '/weather-assets/clouds-day.webp',
+        cloudyNight: '/weather-assets/clouds-night.webp',
+        stormDay: '/weather-assets/storm-day.webp',
+        stormNight: '/weather-assets/storm-night.webp',
     };
 
     function round(value) {
