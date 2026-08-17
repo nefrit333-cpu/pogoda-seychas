@@ -334,15 +334,51 @@
             opacity: .84;
             filter: saturate(.92) contrast(.96);
             transform: scale(1.02);
+            animation: scene-breathe 16s ease-in-out infinite;
             transition-property: opacity, filter, transform;
             transition-duration: 500ms;
             transition-timing-function: cubic-bezier(.2, 0, 0, 1);
+        }
+
+        .weather-visual::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: 1;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 400ms ease;
+        }
+
+        .clear .weather-visual::before {
+            opacity: .8;
+            background:
+                radial-gradient(circle at 72% 23%, rgba(255, 209, 102, .42), transparent 0 10%, rgba(255, 209, 102, .16) 11% 18%, transparent 19%),
+                conic-gradient(from 0deg at 72% 23%, transparent 0 6%, rgba(255, 209, 102, .22) 7% 9%, transparent 10% 16%);
+            animation: sun-rays 8s linear infinite, sun-glow 3.4s ease-in-out infinite;
+        }
+
+        .partly .weather-visual::before {
+            opacity: .42;
+            background:
+                radial-gradient(circle at 73% 24%, rgba(255, 209, 102, .24), transparent 0 11%, rgba(255, 209, 102, .1) 12% 19%, transparent 20%),
+                conic-gradient(from 0deg at 73% 24%, transparent 0 7%, rgba(255, 209, 102, .12) 8% 10%, transparent 11% 18%);
+            animation: sun-rays 14s linear infinite, sun-glow 4.8s ease-in-out infinite;
+        }
+
+        .storm .weather-visual::before {
+            opacity: 0;
+            background:
+                linear-gradient(115deg, transparent 0 47%, rgba(246, 243, 236, .82) 48% 49%, transparent 50% 100%),
+                radial-gradient(circle at 75% 22%, rgba(139, 232, 255, .3), transparent 28%);
+            animation: lightning-flash 6.4s steps(1, end) infinite;
         }
 
         .weather-visual::after {
             content: "";
             position: absolute;
             inset: 0;
+            z-index: 2;
             background:
                 linear-gradient(180deg, rgba(10, 13, 12, .02), rgba(10, 13, 12, .42) 62%, rgba(10, 13, 12, .78)),
                 radial-gradient(circle at 74% 18%, rgba(255, 209, 102, .18), transparent 30%);
@@ -374,8 +410,7 @@
             transition-duration: 500ms;
         }
 
-        .weather-stage.uses-art .sky-object,
-        .weather-stage.uses-art .cloud {
+        .weather-stage.uses-art .sky-object {
             display: none;
         }
 
@@ -411,6 +446,30 @@
             height: 92px;
             right: 38px;
             bottom: 24px;
+        }
+
+        .weather-stage.uses-art .cloud {
+            display: none;
+            top: 112px;
+            left: -78px;
+            width: 210px;
+            height: 70px;
+            z-index: 1;
+            opacity: .34;
+            background: rgba(246, 243, 236, .72);
+            filter: blur(.2px) drop-shadow(0 24px 26px rgba(0, 0, 0, .14));
+            animation: art-cloud-drift 17s ease-in-out infinite;
+        }
+
+        .cloudy .weather-stage.uses-art .cloud,
+        .rainy .weather-stage.uses-art .cloud,
+        .storm .weather-stage.uses-art .cloud {
+            display: block;
+        }
+
+        .night .weather-stage.uses-art .cloud {
+            opacity: .24;
+            background: rgba(210, 216, 218, .54);
         }
 
         .rain {
@@ -670,8 +729,9 @@
         }
 
         .day {
+            position: relative;
             min-height: 128px;
-            padding: 13px 12px;
+            padding: 13px 44px 13px 12px;
             border-radius: 18px;
             background: rgba(246, 243, 236, .08);
             box-shadow: inset 0 0 0 1px rgba(246, 243, 236, .08);
@@ -707,6 +767,83 @@
             color: rgba(246, 243, 236, .72);
             font-size: 13px;
             line-height: 1.35;
+        }
+
+        .forecast-icon {
+            position: absolute;
+            top: 13px;
+            right: 12px;
+            width: 34px;
+            height: 34px;
+            border-radius: 999px;
+            opacity: .96;
+            pointer-events: none;
+            filter: drop-shadow(0 8px 14px rgba(0, 0, 0, .24));
+        }
+
+        .forecast-icon.is-clear {
+            background:
+                radial-gradient(circle at 50% 50%, #ffd166 0 27%, transparent 29%),
+                conic-gradient(from 0deg, transparent 0 5%, rgba(255, 209, 102, .98) 6% 10%, transparent 11% 19%);
+            animation: icon-sun-spin 7s linear infinite, icon-sun-pulse 2.8s ease-in-out infinite;
+        }
+
+        .forecast-icon.is-partly {
+            background:
+                radial-gradient(circle at 35% 56%, rgba(246, 243, 236, .94) 0 23%, transparent 24%),
+                radial-gradient(circle at 56% 45%, rgba(238, 243, 240, .96) 0 29%, transparent 30%),
+                radial-gradient(circle at 73% 59%, rgba(222, 230, 226, .9) 0 21%, transparent 22%),
+                linear-gradient(0deg, rgba(236, 242, 239, .94) 39%, transparent 40%);
+            animation: icon-cloud-drift 4.8s ease-in-out infinite;
+        }
+
+        .forecast-icon.is-cloudy,
+        .forecast-icon.is-rain,
+        .forecast-icon.is-storm {
+            background:
+                radial-gradient(circle at 36% 54%, rgba(214, 220, 216, .88) 0 24%, transparent 25%),
+                radial-gradient(circle at 57% 44%, rgba(226, 231, 228, .92) 0 29%, transparent 30%),
+                radial-gradient(circle at 72% 58%, rgba(206, 214, 211, .86) 0 21%, transparent 22%),
+                linear-gradient(0deg, rgba(218, 224, 221, .9) 39%, transparent 40%);
+        }
+
+        .forecast-icon.is-cloudy {
+            background:
+                radial-gradient(circle at 34% 56%, rgba(150, 158, 155, .92) 0 24%, transparent 25%),
+                radial-gradient(circle at 57% 45%, rgba(170, 178, 175, .95) 0 30%, transparent 31%),
+                radial-gradient(circle at 75% 59%, rgba(132, 142, 139, .9) 0 22%, transparent 23%),
+                linear-gradient(0deg, rgba(152, 162, 159, .94) 39%, transparent 40%);
+            animation: icon-cloud-drift 5.6s ease-in-out infinite;
+        }
+
+        .forecast-icon.is-rain {
+            animation: icon-cloud-drift 4.6s ease-in-out infinite;
+        }
+
+        .forecast-icon.is-rain::after {
+            content: "";
+            position: absolute;
+            left: 7px;
+            right: 5px;
+            bottom: 0;
+            height: 13px;
+            background:
+                linear-gradient(115deg, transparent 0 35%, rgba(139, 232, 255, .92) 36% 47%, transparent 48% 100%) 0 0 / 7px 13px repeat-x;
+            border-radius: 999px;
+            animation: icon-rain-fall 780ms linear infinite;
+        }
+
+        .forecast-icon.is-storm::after {
+            content: "";
+            position: absolute;
+            right: 8px;
+            bottom: -1px;
+            width: 10px;
+            height: 17px;
+            background: #ffd166;
+            clip-path: polygon(44% 0, 100% 0, 64% 42%, 100% 42%, 30% 100%, 48% 56%, 12% 56%);
+            filter: drop-shadow(0 0 8px rgba(255, 209, 102, .55));
+            animation: icon-lightning 2.4s steps(1, end) infinite;
         }
 
         .bar {
@@ -782,10 +919,63 @@
             50% { transform: translate3d(18px, -8px, 0); }
         }
 
+        @keyframes scene-breathe {
+            0%, 100% { transform: scale(1.02) translate3d(0, 0, 0); }
+            50% { transform: scale(1.055) translate3d(-8px, -4px, 0); }
+        }
+
+        @keyframes sun-rays {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes sun-glow {
+            0%, 100% { filter: brightness(1); opacity: .62; }
+            50% { filter: brightness(1.16); opacity: .88; }
+        }
+
+        @keyframes lightning-flash {
+            0%, 68%, 74%, 100% { opacity: 0; }
+            69%, 72% { opacity: .72; }
+            73% { opacity: .18; }
+        }
+
+        @keyframes art-cloud-drift {
+            0%, 100% { transform: translate3d(0, 0, 0) scale(.96); }
+            50% { transform: translate3d(44px, -10px, 0) scale(1.04); }
+        }
+
         @keyframes rain {
             0% { transform: translateY(-22px) rotate(12deg); opacity: 0; }
             18% { opacity: 1; }
             100% { transform: translateY(42px) rotate(12deg); opacity: 0; }
+        }
+
+        @keyframes icon-sun-spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes icon-sun-pulse {
+            0%, 100% { box-shadow: 0 0 0 rgba(255, 209, 102, 0); }
+            50% { box-shadow: 0 0 18px rgba(255, 209, 102, .32); }
+        }
+
+        @keyframes icon-cloud-drift {
+            0%, 100% { transform: translate3d(0, 0, 0); }
+            50% { transform: translate3d(-3px, 1px, 0); }
+        }
+
+        @keyframes icon-rain-fall {
+            0% { transform: translateY(-2px); opacity: .5; }
+            50% { opacity: 1; }
+            100% { transform: translateY(3px); opacity: .52; }
+        }
+
+        @keyframes icon-lightning {
+            0%, 58%, 72%, 100% { opacity: .7; }
+            60%, 66% { opacity: 1; }
+            67% { opacity: .25; }
         }
 
         @keyframes shimmer {
@@ -1184,6 +1374,26 @@
         return weatherImages[`clear${suffix}`];
     }
 
+    function getForecastIconType(code) {
+        if (stormCodes.has(code)) {
+            return 'storm';
+        }
+
+        if (rainyCodes.has(code)) {
+            return 'rain';
+        }
+
+        if (cloudyCodes.has(code)) {
+            return 'cloudy';
+        }
+
+        if (partlyCloudyCodes.has(code)) {
+            return 'partly';
+        }
+
+        return 'clear';
+    }
+
     function formatAccuracy(value) {
         if (!Number.isFinite(value)) {
             return 'по данным браузера';
@@ -1349,9 +1559,11 @@
             const min = round(daily.temperature_2m_min[index]);
             const code = daily.weather_code[index];
             const chance = daily.precipitation_probability_max[index] ?? 0;
+            const iconType = getForecastIconType(code);
 
             return `
                 <article class="day">
+                    <span class="forecast-icon is-${iconType}" aria-hidden="true"></span>
                     <div class="day-name">${day}</div>
                     <div class="day-temp">${max}°/${min}°</div>
                     <div class="day-desc">${weatherText[code] ?? 'Переменная погода'}</div>
@@ -1368,9 +1580,15 @@
         const isNight = isNightAt(current.time);
         const isRainy = rainyCodes.has(code);
         const isStorm = stormCodes.has(code);
+        const isPartly = partlyCloudyCodes.has(code);
+        const isCloudy = cloudyCodes.has(code);
+        const isClear = !isRainy && !isStorm && !isCloudy && !isPartly;
 
         app.classList.toggle('night', isNight);
         app.classList.toggle('dry', !isRainy);
+        app.classList.toggle('clear', isClear);
+        app.classList.toggle('partly', isPartly);
+        app.classList.toggle('cloudy', isCloudy || isPartly);
         app.classList.toggle('rainy', isRainy && !isStorm);
         app.classList.toggle('storm', isStorm);
         els.weatherImage.src = getWeatherImage(code, current.time);
