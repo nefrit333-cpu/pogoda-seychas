@@ -317,6 +317,48 @@
                 0 28px 90px rgba(0, 0, 0, .28);
         }
 
+        .weather-visual {
+            position: absolute;
+            inset: 0 0 auto;
+            height: 360px;
+            margin: 0;
+            overflow: hidden;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .weather-visual img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: .84;
+            filter: saturate(.92) contrast(.96);
+            transform: scale(1.02);
+            transition-property: opacity, filter, transform;
+            transition-duration: 500ms;
+            transition-timing-function: cubic-bezier(.2, 0, 0, 1);
+        }
+
+        .weather-visual::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(180deg, rgba(10, 13, 12, .02), rgba(10, 13, 12, .42) 62%, rgba(10, 13, 12, .78)),
+                radial-gradient(circle at 74% 18%, rgba(255, 209, 102, .18), transparent 30%);
+        }
+
+        .night .weather-visual img {
+            opacity: .76;
+            filter: saturate(.88) contrast(1.04) brightness(.82);
+        }
+
+        .night .weather-visual::after {
+            background:
+                linear-gradient(180deg, rgba(10, 13, 12, .12), rgba(10, 13, 12, .52) 58%, rgba(10, 13, 12, .82)),
+                radial-gradient(circle at 72% 17%, rgba(246, 243, 236, .1), transparent 26%);
+        }
+
         .sky-object {
             position: absolute;
             top: 52px;
@@ -330,6 +372,11 @@
                 0 0 80px rgba(255, 209, 102, .5);
             transition-property: background, box-shadow, transform;
             transition-duration: 500ms;
+        }
+
+        .weather-stage.uses-art .sky-object,
+        .weather-stage.uses-art .cloud {
+            display: none;
         }
 
         .cloud {
@@ -374,6 +421,17 @@
             gap: 16px;
             opacity: .36;
             transition: opacity 300ms ease;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .weather-stage.uses-art .rain {
+            inset: 34px 36px auto 42px;
+            opacity: 0;
+        }
+
+        .rainy .weather-stage.uses-art .rain {
+            opacity: .52;
         }
 
         .rain span {
@@ -390,6 +448,7 @@
             left: 24px;
             right: 24px;
             bottom: 24px;
+            z-index: 2;
             padding: 26px;
             border-radius: 20px;
             background: rgba(10, 13, 12, .72);
@@ -546,17 +605,18 @@
         .hourly-track {
             display: grid;
             grid-auto-flow: column;
-            grid-auto-columns: minmax(86px, 1fr);
+            grid-auto-columns: minmax(128px, 1fr);
             gap: 10px;
             overflow-x: auto;
             overscroll-behavior-inline: contain;
             padding: 1px 1px 8px;
+            scroll-snap-type: inline proximity;
             scrollbar-width: thin;
             scrollbar-color: rgba(246, 243, 236, .22) transparent;
         }
 
         .hour-card {
-            min-height: 104px;
+            min-height: 118px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -594,7 +654,8 @@
 
         .hour-meta {
             margin-top: 8px;
-            line-height: 1.35;
+            line-height: 1.32;
+            overflow-wrap: anywhere;
         }
 
         .weekly-section {
@@ -603,7 +664,7 @@
 
         .forecast {
             display: grid;
-            grid-template-columns: repeat(5, minmax(0, 1fr));
+            grid-template-columns: repeat(3, minmax(0, 1fr));
             gap: 12px;
             margin-top: 10px;
         }
@@ -711,6 +772,11 @@
             opacity: .8;
         }
 
+        .dry .weather-stage.uses-art .rain,
+        .storm .weather-stage.uses-art .rain {
+            opacity: 0;
+        }
+
         @keyframes drift {
             0%, 100% { transform: translate3d(0, 0, 0); }
             50% { transform: translate3d(18px, -8px, 0); }
@@ -797,7 +863,15 @@
 
             .search-card input,
             .primary-btn {
-                min-height: 48px;
+                min-height: 50px;
+            }
+
+            .search-card input {
+                font-family: "Unbounded", "Manrope", ui-sans-serif, system-ui, sans-serif;
+                padding-inline: 16px;
+                font-size: 17px;
+                font-weight: 750;
+                letter-spacing: 0;
             }
 
             .hero {
@@ -831,11 +905,19 @@
                 border-radius: 18px;
             }
 
+            .weather-visual {
+                height: 208px;
+            }
+
             .sky-object {
                 top: 38px;
                 right: 30px;
                 width: 76px;
                 height: 76px;
+            }
+
+            .weather-visual img {
+                min-height: 208px;
             }
 
             .cloud {
@@ -902,7 +984,8 @@
             }
 
             .hourly-track {
-                grid-auto-columns: minmax(104px, 44%);
+                grid-auto-columns: minmax(126px, 42%);
+                padding-right: 10px;
             }
 
             .section-label {
@@ -947,7 +1030,10 @@
                 <div class="state" id="state" role="status" aria-live="polite"></div>
             </div>
 
-            <section class="weather-stage" aria-label="Погодная сводка">
+            <section class="weather-stage uses-art" aria-label="Погодная сводка">
+                <figure class="weather-visual" aria-hidden="true">
+                    <img id="weatherImage" src="/weather-assets/clouds-day.png" alt="">
+                </figure>
                 <div class="sky-object" aria-hidden="true"></div>
                 <div class="cloud" aria-hidden="true"></div>
                 <div class="rain" aria-hidden="true">
@@ -1005,6 +1091,7 @@
         pressure: document.querySelector('#pressure'),
         hourly: document.querySelector('#hourlyForecast'),
         forecast: document.querySelector('#forecast'),
+        weatherImage: document.querySelector('#weatherImage'),
     };
 
     const weatherText = {
@@ -1040,9 +1127,61 @@
 
     const rainyCodes = new Set([51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82, 95, 96, 99]);
     const stormCodes = new Set([65, 82, 95, 96, 99]);
+    const cloudyCodes = new Set([3, 45, 48, 71, 73, 75, 77, 85, 86]);
+    const partlyCloudyCodes = new Set([1, 2]);
+    const weatherImages = {
+        clearDay: '/weather-assets/sunny.png',
+        clearNight: '/weather-assets/moon.png',
+        partlyDay: '/weather-assets/sun-cloud.png',
+        partlyNight: '/weather-assets/moon-cloud.png',
+        cloudyDay: '/weather-assets/clouds-day.png',
+        cloudyNight: '/weather-assets/clouds-night.png',
+        stormDay: '/weather-assets/storm-day.png',
+        stormNight: '/weather-assets/storm-night.png',
+    };
 
     function round(value) {
         return Math.round(Number(value));
+    }
+
+    function formatWind(value) {
+        const number = Number(value);
+        if (!Number.isFinite(number)) {
+            return '--';
+        }
+
+        return new Intl.NumberFormat('ru-RU', {
+            maximumFractionDigits: number < 10 ? 1 : 0,
+        }).format(number);
+    }
+
+    function isNightAt(time) {
+        const hour = Number(String(time || '').slice(11, 13));
+
+        return Number.isFinite(hour) && (hour >= 21 || hour < 5);
+    }
+
+    function getWeatherImage(code, time) {
+        const isNight = isNightAt(time);
+        const suffix = isNight ? 'Night' : 'Day';
+
+        if (stormCodes.has(code)) {
+            return weatherImages[`storm${suffix}`];
+        }
+
+        if (rainyCodes.has(code)) {
+            return weatherImages[`cloudy${suffix}`];
+        }
+
+        if (cloudyCodes.has(code)) {
+            return weatherImages[`cloudy${suffix}`];
+        }
+
+        if (partlyCloudyCodes.has(code)) {
+            return weatherImages[`partly${suffix}`];
+        }
+
+        return weatherImages[`clear${suffix}`];
     }
 
     function formatAccuracy(value) {
@@ -1131,7 +1270,8 @@
             hourly: 'temperature_2m,relative_humidity_2m,precipitation_probability,weather_code,wind_speed_10m',
             daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max',
             timezone: 'auto',
-            forecast_days: '5',
+            wind_speed_unit: 'ms',
+            forecast_days: '6',
         });
 
         const data = await fetchJson(url);
@@ -1185,7 +1325,7 @@
         els.hourly.innerHTML = todayHours.map(({ time, index }) => {
             const hour = new Intl.DateTimeFormat('ru-RU', { hour: '2-digit', minute: '2-digit' }).format(new Date(time));
             const temp = round(hourly.temperature_2m[index]);
-            const wind = round(hourly.wind_speed_10m[index]);
+            const wind = formatWind(hourly.wind_speed_10m[index]);
             const humidity = round(hourly.relative_humidity_2m[index]);
             const rain = hourly.precipitation_probability[index] ?? 0;
             const code = hourly.weather_code[index];
@@ -1196,7 +1336,7 @@
                         <div class="hour-time">${hour}</div>
                         <div class="hour-temp">${temp}°</div>
                     </div>
-                    <div class="hour-meta">${weatherText[code] ?? 'Переменно'}<br>${rain}% дождь · ${wind} км/ч · ${humidity}%</div>
+                    <div class="hour-meta">${weatherText[code] ?? 'Переменно'}<br>${rain}% дождь · ${wind} м/с · ${humidity}%</div>
                 </article>
             `;
         }).join('');
@@ -1225,13 +1365,16 @@
         const { data, label } = payload;
         const current = data.current;
         const code = current.weather_code;
-        const isNight = Number(current.is_day) === 0;
+        const isNight = isNightAt(current.time);
         const isRainy = rainyCodes.has(code);
         const isStorm = stormCodes.has(code);
 
         app.classList.toggle('night', isNight);
         app.classList.toggle('dry', !isRainy);
+        app.classList.toggle('rainy', isRainy && !isStorm);
         app.classList.toggle('storm', isStorm);
+        els.weatherImage.src = getWeatherImage(code, current.time);
+        els.weatherImage.alt = '';
 
         const visibleLabel = compactPlaceLabel(label);
         els.place.classList.toggle('long-place', visibleLabel.length > 18);
@@ -1241,7 +1384,7 @@
         els.condition.textContent = `${weatherText[code] ?? 'Переменная погода'} · облачность ${round(current.cloud_cover)}%`;
         els.temperature.textContent = `${round(current.temperature_2m)}°`;
         els.feels.textContent = `${round(current.apparent_temperature)}°`;
-        els.wind.textContent = `${round(current.wind_speed_10m)} км/ч`;
+        els.wind.textContent = `${formatWind(current.wind_speed_10m)} м/с`;
         els.humidity.textContent = `${round(current.relative_humidity_2m)}%`;
         els.pressure.textContent = `${round(current.surface_pressure)} гПа`;
         els.updatedAt.textContent = new Intl.DateTimeFormat('ru-RU', {

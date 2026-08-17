@@ -1,5 +1,6 @@
 *.log
 .DS_Store
+.agent-work/
 .env
 .env.backup
 .env.production
@@ -16,6 +17,7 @@
 /auth.json
 /database/*.sqlite
 /node_modules
+/outputs/
 /public/build
 /public/fonts-manifest.dev.json
 /public/hot

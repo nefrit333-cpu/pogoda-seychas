@@ -3,6 +3,8 @@
 $source = __DIR__ . '/../resources/views/welcome.blade.php';
 $targetDirectory = __DIR__ . '/../vercel';
 $target = $targetDirectory . '/index.html';
+$assetSourceDirectory = __DIR__ . '/../public/weather-assets';
+$assetTargetDirectory = $targetDirectory . '/weather-assets';
 
 if (! is_file($source)) {
     fwrite(STDERR, "Source Blade view not found: {$source}\n");
@@ -30,6 +32,22 @@ $html = str_replace(
 if (file_put_contents($target, $html) === false) {
     fwrite(STDERR, "Unable to write static export: {$target}\n");
     exit(1);
+}
+
+if (is_dir($assetSourceDirectory)) {
+    if (! is_dir($assetTargetDirectory) && ! mkdir($assetTargetDirectory, 0775, true)) {
+        fwrite(STDERR, "Unable to create asset target directory: {$assetTargetDirectory}\n");
+        exit(1);
+    }
+
+    foreach (glob($assetSourceDirectory . '/*') ?: [] as $asset) {
+        $targetAsset = $assetTargetDirectory . '/' . basename($asset);
+
+        if (is_file($asset) && ! copy($asset, $targetAsset)) {
+            fwrite(STDERR, "Unable to copy weather asset: {$asset}\n");
+            exit(1);
+        }
+    }
 }
 
 echo "Static export written to {$target}\n";
