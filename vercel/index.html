@@ -46,15 +46,6 @@
             overflow-x: hidden;
         }
 
-        button,
-        input {
-            font: inherit;
-        }
-
-        button {
-            cursor: pointer;
-        }
-
         .page {
             position: relative;
             isolation: isolate;
@@ -76,7 +67,7 @@
         }
 
         .shell {
-            width: min(1180px, 100%);
+            width: min(680px, 100%);
             margin: 0 auto;
         }
 
@@ -86,7 +77,7 @@
             justify-content: space-between;
             gap: 18px;
             min-height: 52px;
-            margin-bottom: 34px;
+            margin-bottom: 22px;
         }
 
         .brand {
@@ -148,160 +139,13 @@
             white-space: nowrap;
         }
 
+        .status-pill.is-error {
+            color: #ffb4a0;
+            background: rgba(255, 122, 89, .12);
+        }
+
         .hero {
-            display: grid;
-            grid-template-columns: minmax(0, 1.02fr) minmax(360px, .98fr);
-            gap: 22px;
-            align-items: stretch;
-        }
-
-        .intro {
-            min-height: 760px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            padding: 42px;
-            border-radius: var(--radius);
-            background: rgba(17, 25, 22, .64);
-            box-shadow:
-                inset 0 1px 0 rgba(255, 255, 255, .12),
-                0 28px 90px rgba(0, 0, 0, .24);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .intro::after {
-            content: "";
-            position: absolute;
-            inset: auto -12% -28% 10%;
-            height: 260px;
-            background: linear-gradient(90deg, rgba(167, 243, 208, .3), rgba(139, 232, 255, .18), transparent);
-            transform: skewY(-8deg);
-            pointer-events: none;
-        }
-
-        h1 {
-            max-width: 720px;
-            margin: 0;
-            font-family: "Unbounded", "Manrope", ui-sans-serif, system-ui, sans-serif;
-            font-size: clamp(40px, 6.1vw, 82px);
-            line-height: 1.03;
-            letter-spacing: 0;
-            text-wrap: balance;
-        }
-
-        .lead {
-            max-width: 560px;
-            margin: 22px 0 0;
-            color: var(--muted);
-            font-size: clamp(17px, 2vw, 21px);
-            line-height: 1.55;
-            text-wrap: pretty;
-        }
-
-        .search-card {
-            position: relative;
-            z-index: 1;
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
-            gap: 10px;
-            align-items: center;
-            width: min(720px, 100%);
-            padding: 10px;
-            border-radius: 18px;
-            background: rgba(246, 243, 236, .92);
-            color: #101410;
-            box-shadow: 0 24px 60px rgba(0, 0, 0, .32);
-            transition-property: transform, box-shadow, background;
-            transition-duration: 180ms;
-            transition-timing-function: cubic-bezier(.2, 0, 0, 1);
-        }
-
-        .search-card:hover {
-            transform: translateY(-2px);
-            background: rgba(246, 243, 236, .96);
-            box-shadow: 0 30px 74px rgba(0, 0, 0, .38);
-        }
-
-        .search-card label {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            overflow: hidden;
-            clip: rect(0 0 0 0);
-        }
-
-        .search-card input {
-            width: 100%;
-            min-height: 50px;
-            border: 0;
-            outline: 0;
-            border-radius: 12px;
-            padding: 0 14px;
-            background: transparent;
-            color: #101410;
-            font-size: 17px;
-            transition-property: background, box-shadow;
-            transition-duration: 180ms;
-            transition-timing-function: cubic-bezier(.2, 0, 0, 1);
-        }
-
-        .search-card input:hover {
-            background: rgba(16, 20, 16, .04);
-        }
-
-        .search-card input::placeholder {
-            color: rgba(16, 20, 16, .58);
-        }
-
-        .search-card input:focus-visible {
-            box-shadow: inset 0 0 0 2px rgba(255, 122, 89, .8);
-        }
-
-        .primary-btn,
-        .ghost-btn {
-            min-height: 50px;
-            border: 0;
-            border-radius: 12px;
-            padding: 0 18px;
-            font-weight: 750;
-            white-space: nowrap;
-            transition-property: transform, background, color, box-shadow;
-            transition-duration: 180ms;
-            transition-timing-function: cubic-bezier(.2, 0, 0, 1);
-        }
-
-        .primary-btn {
-            background: #101410;
-            color: #fffaf0;
-            box-shadow: 0 12px 24px rgba(16, 20, 16, .22);
-        }
-
-        .ghost-btn {
-            background: rgba(16, 20, 16, .08);
-            color: #101410;
-        }
-
-        .primary-btn:hover,
-        .ghost-btn:hover {
-            transform: translateY(-1px);
-        }
-
-        .primary-btn:hover {
-            background: #1b221d;
-            box-shadow: 0 16px 32px rgba(16, 20, 16, .3);
-        }
-
-        .primary-btn:active,
-        .ghost-btn:active {
-            transform: scale(.96);
-        }
-
-        .primary-btn:disabled,
-        .ghost-btn:disabled {
-            cursor: wait;
-            opacity: .72;
-            transform: none;
+            display: block;
         }
 
         .weather-stage {
@@ -901,20 +745,13 @@
             height: 100%;
             width: var(--w, 40%);
             border-radius: inherit;
-            background: linear-gradient(90deg, var(--mint), var(--coral));
+            background: linear-gradient(90deg, var(--mint), var(--aqua));
         }
 
         .footnote {
             margin-top: 20px;
             color: rgba(246, 243, 236, .54);
             font-size: 13px;
-        }
-
-        .state {
-            margin-top: 16px;
-            min-height: 22px;
-            color: var(--gold);
-            font-size: 14px;
         }
 
         .loading .temperature,
@@ -1040,18 +877,8 @@
                 padding: 18px;
             }
 
-            .hero {
-                grid-template-columns: 1fr;
-            }
-
-            .intro,
             .weather-stage {
                 min-height: auto;
-            }
-
-            .intro {
-                gap: 42px;
-                padding: 30px;
             }
 
             .weather-stage {
@@ -1069,6 +896,12 @@
         }
 
         @media (max-width: 640px) {
+            body {
+                background:
+                    linear-gradient(115deg, rgba(255, 122, 89, .14), transparent 42%),
+                    linear-gradient(180deg, #171c18 0%, #0d110f 48%, #070908 100%);
+            }
+
             .page {
                 padding: 14px;
             }
@@ -1086,55 +919,18 @@
                 min-height: 38px;
             }
 
-            .search-card {
-                grid-template-columns: 1fr;
-                gap: 8px;
-                padding: 9px;
-                border-radius: 16px;
-            }
-
-            .search-card input,
-            .primary-btn {
-                min-height: 50px;
-            }
-
-            .search-card input {
-                font-family: "Unbounded", "Manrope", ui-sans-serif, system-ui, sans-serif;
-                padding-inline: 16px;
-                font-size: 17px;
-                font-weight: 750;
-                letter-spacing: 0;
-            }
-
-            .hero {
-                gap: 14px;
-            }
-
-            .intro {
-                gap: 34px;
-                padding: 24px;
-                border-radius: 18px;
-            }
-
-            h1 {
-                font-size: clamp(34px, 13vw, 52px);
-                line-height: 1.06;
-            }
-
-            .lead {
-                margin-top: 18px;
-                font-size: 16px;
-            }
-
-            .primary-btn,
-            .ghost-btn {
-                width: 100%;
-            }
-
             .weather-stage {
                 min-height: auto;
                 padding-top: 208px;
                 border-radius: 18px;
+                background: #0b0f0e;
+                box-shadow:
+                    inset 0 1px 0 rgba(255, 255, 255, .08),
+                    0 22px 64px rgba(0, 0, 0, .28);
+            }
+
+            .night .weather-stage {
+                background: #0b0f0e;
             }
 
             .weather-visual {
@@ -1244,24 +1040,10 @@
                 <span class="brand-mark" aria-hidden="true"></span>
                 <span>Погода сейчас</span>
             </a>
-            <div class="status-pill" id="updatedAt">Данные обновляются</div>
+            <div class="status-pill" id="updatedAt">Определяю место</div>
         </header>
 
-        <section class="hero" aria-labelledby="page-title">
-            <div class="intro">
-                <div>
-                    <h1 id="page-title">Живая погода без суеты жизни</h1>
-                    <p class="lead">Город, температура, ветер, влажность и прогноз на ближайшие дни в одном спокойном экране.</p>
-                </div>
-
-                <form class="search-card" id="searchForm">
-                    <label for="cityInput">Город</label>
-                    <input id="cityInput" name="city" autocomplete="address-level2" value="" placeholder="Введите город">
-                    <button class="primary-btn" type="submit">Показать</button>
-                </form>
-                <div class="state" id="state" role="status" aria-live="polite"></div>
-            </div>
-
+        <section class="hero" aria-label="Погода по текущему местоположению">
             <section class="weather-stage uses-art" aria-label="Погодная сводка">
                 <figure class="weather-visual" aria-hidden="true">
                     <img id="weatherImage" src="/weather-assets/clouds-day.webp" alt="">
@@ -1308,9 +1090,6 @@
 
 <script>
     const app = document.querySelector('#app');
-    const form = document.querySelector('#searchForm');
-    const input = document.querySelector('#cityInput');
-    const state = document.querySelector('#state');
     const panel = document.querySelector('#weatherPanel');
     const els = {
         updatedAt: document.querySelector('#updatedAt'),
@@ -1436,18 +1215,6 @@
         return 'clear';
     }
 
-    function formatAccuracy(value) {
-        if (!Number.isFinite(value)) {
-            return 'по данным браузера';
-        }
-
-        return value >= 1000 ? `±${(value / 1000).toFixed(1)} км` : `±${Math.round(value)} м`;
-    }
-
-    function formatPoint(latitude, longitude) {
-        return `${Number(latitude).toFixed(5)}, ${Number(longitude).toFixed(5)}`;
-    }
-
     function isAdministrativeName(name) {
         return /городской округ|муниципальный округ|муниципальный район|район/i.test(name || '');
     }
@@ -1465,8 +1232,8 @@
     }
 
     function setState(message, isError = false) {
-        state.textContent = message;
-        state.style.color = isError ? '#ffb4a0' : '#ffd166';
+        els.updatedAt.textContent = message || 'Данные обновляются';
+        els.updatedAt.classList.toggle('is-error', isError);
     }
 
     function setLoading(isLoading) {
@@ -1494,23 +1261,6 @@
             throw new Error('Сервис погоды временно недоступен');
         }
         return response.json();
-    }
-
-    async function findCity(name) {
-        const url = new URL('https://geocoding-api.open-meteo.com/v1/search');
-        url.search = new URLSearchParams({
-            name,
-            count: '1',
-            language: 'ru',
-            format: 'json',
-        });
-
-        const data = await fetchJson(url);
-        const place = data.results?.[0];
-        if (!place) {
-            throw new Error('Город не найден. Проверьте название и попробуйте ещё раз');
-        }
-        return place;
     }
 
     async function getWeather(latitude, longitude, label) {
@@ -1657,39 +1407,17 @@
         renderHourly(data.hourly, current.time);
         renderForecast(data.daily);
         setLoading(false);
-        setState('');
+        els.updatedAt.classList.remove('is-error');
     }
 
-    async function loadByCity(name) {
-        const city = name.trim();
-        if (!city) {
-            setState('Введите название города', true);
-            return;
-        }
-
+    async function loadByCoordinates(latitude, longitude) {
         setLoading(true);
-        setState('Ищу город и обновляю прогноз');
-
-        try {
-            const place = await findCity(city);
-            const payload = await getWeather(place.latitude, place.longitude, place.name);
-            renderWeather(payload);
-            input.value = place.name;
-        } catch (error) {
-            setLoading(false);
-            setState(error.message, true);
-        }
-    }
-
-    async function loadByCoordinates(latitude, longitude, accuracy) {
-        setLoading(true);
-        setState(`Точка найдена: ${formatPoint(latitude, longitude)}, определяю населённый пункт`);
+        setState('Определяю населённый пункт');
 
         try {
             const place = await reverseGeocode(latitude, longitude);
             const payload = await getWeather(latitude, longitude, place.displayName);
             renderWeather(payload);
-            input.value = place.displayName;
         } catch (error) {
             setLoading(false);
             setState(error.message, true);
@@ -1699,7 +1427,7 @@
     function requestCurrentLocation() {
         if (!navigator.geolocation) {
             renderEmptyLocationState('Геолокация не поддерживается этим браузером');
-            setState('Введите город вручную', true);
+            setState('Геолокация недоступна', true);
             return;
         }
 
@@ -1709,21 +1437,15 @@
         navigator.geolocation.getCurrentPosition(
             (position) => loadByCoordinates(
                 position.coords.latitude,
-                position.coords.longitude,
-                position.coords.accuracy
+                position.coords.longitude
             ),
             () => {
-                renderEmptyLocationState('Разрешите геолокацию или введите город вручную');
-                setState('Браузер не дал доступ к точному местоположению', true);
+                renderEmptyLocationState('Разрешите геолокацию в браузере и обновите страницу');
+                setState('Нет доступа к местоположению', true);
             },
             { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 }
         );
     }
-
-    form.addEventListener('submit', (event) => {
-        event.preventDefault();
-        loadByCity(input.value);
-    });
 
     requestCurrentLocation();
 </script>
