@@ -789,12 +789,24 @@
         }
 
         .forecast-icon.is-partly {
-            background:
-                radial-gradient(circle at 35% 56%, rgba(246, 243, 236, .94) 0 23%, transparent 24%),
-                radial-gradient(circle at 56% 45%, rgba(238, 243, 240, .96) 0 29%, transparent 30%),
-                radial-gradient(circle at 73% 59%, rgba(222, 230, 226, .9) 0 21%, transparent 22%),
-                linear-gradient(0deg, rgba(236, 242, 239, .94) 39%, transparent 40%);
+            background: none;
             animation: icon-cloud-drift 4.8s ease-in-out infinite;
+        }
+
+        .forecast-icon.is-partly::before {
+            content: "";
+            position: absolute;
+            left: 3px;
+            top: 7px;
+            width: 28px;
+            height: 18px;
+            border-radius: 13px 13px 9px 9px;
+            background:
+                radial-gradient(circle at 28% 62%, rgba(229, 237, 233, .96) 0 7px, transparent 7.5px),
+                radial-gradient(circle at 50% 39%, rgba(247, 250, 248, .98) 0 9px, transparent 9.5px),
+                radial-gradient(circle at 72% 61%, rgba(211, 224, 219, .95) 0 7px, transparent 7.5px),
+                linear-gradient(0deg, rgba(224, 234, 230, .98) 0 11px, transparent 11.5px);
+            filter: drop-shadow(0 4px 7px rgba(0, 0, 0, .14));
         }
 
         .forecast-icon.is-cloudy,
@@ -808,28 +820,58 @@
         }
 
         .forecast-icon.is-cloudy {
-            background:
-                radial-gradient(circle at 34% 56%, rgba(150, 158, 155, .92) 0 24%, transparent 25%),
-                radial-gradient(circle at 57% 45%, rgba(170, 178, 175, .95) 0 30%, transparent 31%),
-                radial-gradient(circle at 75% 59%, rgba(132, 142, 139, .9) 0 22%, transparent 23%),
-                linear-gradient(0deg, rgba(152, 162, 159, .94) 39%, transparent 40%);
+            background: none;
             animation: icon-cloud-drift 5.6s ease-in-out infinite;
         }
 
+        .forecast-icon.is-cloudy::before {
+            content: "";
+            position: absolute;
+            left: 3px;
+            top: 7px;
+            width: 28px;
+            height: 18px;
+            border-radius: 13px 13px 9px 9px;
+            background:
+                radial-gradient(circle at 28% 62%, rgba(123, 133, 130, .96) 0 7px, transparent 7.5px),
+                radial-gradient(circle at 50% 39%, rgba(159, 169, 165, .98) 0 9px, transparent 9.5px),
+                radial-gradient(circle at 72% 61%, rgba(103, 114, 111, .95) 0 7px, transparent 7.5px),
+                linear-gradient(0deg, rgba(137, 148, 144, .98) 0 11px, transparent 11.5px);
+            filter: drop-shadow(0 4px 7px rgba(0, 0, 0, .18));
+        }
+
         .forecast-icon.is-rain {
+            background: none;
             animation: icon-cloud-drift 4.6s ease-in-out infinite;
+        }
+
+        .forecast-icon.is-rain::before {
+            content: "";
+            position: absolute;
+            left: 3px;
+            top: 7px;
+            width: 28px;
+            height: 18px;
+            border-radius: 13px 13px 9px 9px;
+            background:
+                radial-gradient(circle at 28% 62%, rgba(229, 237, 233, .96) 0 7px, transparent 7.5px),
+                radial-gradient(circle at 50% 39%, rgba(247, 250, 248, .98) 0 9px, transparent 9.5px),
+                radial-gradient(circle at 72% 61%, rgba(211, 224, 219, .95) 0 7px, transparent 7.5px),
+                linear-gradient(0deg, rgba(224, 234, 230, .98) 0 11px, transparent 11.5px);
+            filter: drop-shadow(0 4px 7px rgba(0, 0, 0, .16));
         }
 
         .forecast-icon.is-rain::after {
             content: "";
             position: absolute;
-            left: 7px;
-            right: 5px;
-            bottom: 0;
-            height: 13px;
+            left: 9px;
+            right: 8px;
+            bottom: 1px;
+            height: 11px;
             background:
-                linear-gradient(115deg, transparent 0 35%, rgba(139, 232, 255, .92) 36% 47%, transparent 48% 100%) 0 0 / 7px 13px repeat-x;
+                linear-gradient(112deg, transparent 0 34%, rgba(122, 226, 255, .95) 35% 49%, transparent 50% 100%) 0 0 / 8px 11px repeat-x;
             border-radius: 999px;
+            opacity: .98;
             animation: icon-rain-fall 780ms linear infinite;
         }
 
